@@ -24,7 +24,7 @@ class AsteriskQueueRegex {
 	public function processFile(){
 		$this->pdone = true;
 		// Get the first row and destroy it, it's just our datetime stamp.
-		$row = fgets($this->fp);
+		//$row = fgets($this->fp);
 		// Now get the next row, and then to our data.
 		$row = fgets($this->fp);
 			// First get the queue name.
@@ -51,14 +51,16 @@ class AsteriskQueueRegex {
 					}
 					$this->_addAgent($row);
 				}
+			} else {
+				$row = fgets($this->fp);
 			}
 		// Now onto the callers...
 		// We've already got the row thanks to the function above, just process...
 		if ($this->_checkCallers($row)){
 			$callers = true;
 			while ($callers == true){
-				$row = fgets($this->fp);
-				if (trim($row) == ''){
+				$row = @fgets($this->fp);
+				if (trim($row) == '' || !$row){
 					$callers = false;
 					continue;
 				}
@@ -176,7 +178,7 @@ class AsteriskQueueRegex {
 	}
 	
 	private function _checkAgent($row){
-		$mat = preg_match("/AGENT\/[0-9]+/", $row);
+		$mat = preg_match("/[a-zA-Z0-9]+\/[0-9]+/", $row);
 		
 		if ($mat){
 			return true;
@@ -222,7 +224,7 @@ class AsteriskQueueRegex {
 	private function _getAgentID($row){
 		$arr = array();
 
-		$mat = preg_match("/AGENT\/([0-9]+)/", $row, $arr);
+		$mat = preg_match("/([a-zA-Z0-9]+\/[0-9]+)/", $row, $arr);
 		
 		if ($mat){
 			return $arr[1];
