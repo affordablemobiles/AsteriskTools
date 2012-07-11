@@ -9,7 +9,7 @@
 +-------------------------------*/
 
 class AsteriskCacheUpdate {
-	private $cachefolder = 'cache/asterisk/'
+	private $cachefolder;
 	private $qData;
 	private $qResults;
 	private $regexLib;
@@ -19,9 +19,16 @@ class AsteriskCacheUpdate {
 	private $queuefp;
 	private $queueFile;
 	
-	public function __contruct($queueData){
+	public function __construct($queueData){
 		$this->qData = $queueData;
+	}
 	
+	public function setCacheFolder($dir){
+		if (is_dir($dir))
+			$this->cachefolder = $dir;
+	}
+	
+	public function processData(){
 		$this->_performRegex();
 		
 		$this->_setIndexFile();
@@ -59,7 +66,7 @@ class AsteriskCacheUpdate {
 		if (!is_file($this->indexFile))
 			touch($this->indexFile);
 		$this->indexfp = fopen($this->indexFile, 'r+');
-		flock($this->indexfp, 'LOCK_EX');
+		flock($this->indexfp, LOCK_EX);
 	}
 	
 	private function _setQueueFile(){
@@ -67,7 +74,7 @@ class AsteriskCacheUpdate {
 		if (!is_file($this->queueFile))
 			touch($this->queueFile);
 		$this->queuefp = fopen($this->queueFile, 'r+');
-		flock($this->queuefp, 'LOCK_EX');
+		flock($this->queuefp, LOCK_EX);
 	}
 	
 	private function _indexStart(){
@@ -78,8 +85,8 @@ class AsteriskCacheUpdate {
 	}
 	
 	private function _closeFiles(){
-		flock($this->queuefp, 'LOCK_UN');
-		flock($this->indexfp, 'LOCK_UN');
+		flock($this->queuefp, LOCK_UN);
+		flock($this->indexfp, LOCK_UN);
 		
 		fclose($this->queuefp);
 		fclose($this->indexfp);
@@ -102,7 +109,7 @@ class AsteriskCacheUpdate {
 	}
 	
 	private function _updateIndex(){
-		$this->index['queues'][$this->qResults['queueid']] = TDATETIME;
+		$this->index['queues'][$this->qResults['queueid']] = time();
 		
 		$this->_clearFile($this->indexfp);
 		
