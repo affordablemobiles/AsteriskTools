@@ -63,7 +63,7 @@ class AsteriskCacheUpdate {
 	}
 	
 	private function _setQueueFile(){
-		$this->queueFile = $this->cachefolder . 'queue_ ' . $this->qResults['queueid'] . '.dat';
+		$this->queueFile = $this->cachefolder . 'queue_' . $this->qResults['queueid'] . '.dat';
 		if (!is_file($this->queueFile))
 			touch($this->queueFile);
 		$this->queuefp = fopen($this->queueFile, 'r+');
