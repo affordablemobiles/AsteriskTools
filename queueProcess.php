@@ -16,12 +16,15 @@ $submitAsterisk	= @$_POST['submitAsterisk'] == '' ? '' : $_POST['submitAsterisk'
 $queueData		= @$_POST['queueData'] == '' ? '' : $_POST['queueData'];
 $queueData		= base64_decode($queueData);
 
+require "classes/class.AsteriskCacheUpdate.php";
+require "classes/class.AsteriskQueueRegex.php";
+
 if (!empty($queueData) && $submitAsterisk == 'true'){
 	
 	$eachqueue = explode("\n\n", $queueData);
 	
 	for ($i = 0;$i < (count($eachqueue)-1);$i++){
-		$worker = new Asterisk_QueueCacheUpdate($eachqueue[$i]);
+		$worker = new AsteriskCacheUpdate($eachqueue[$i]);
 		$worker->setCacheFolder('/tmp/cache/asterisk');
 		$worker->processData();
 	}
